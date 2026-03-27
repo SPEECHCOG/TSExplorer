@@ -1,0 +1,2 @@
+include tsexplorer/configs/defaults.yml
+include tsexplorer/configs/template_config.yml

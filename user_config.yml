@@ -1,0 +1,131 @@
+# This is the configuration file for the application
+version: 1.0.0
+
+# Define the name of the annotator and the labels for the annotation
+annotator: name_of_annotator
+labels: 
+    - "1: prone"
+    - "2: supine"
+    - "3: side"
+    - "4: crawl"
+    - "5: sitting"
+    - "6: standing"
+    - "7: N/A"
+
+# Define the backend for selecting the samples. Currently supported values are 
+# 'farthest-first', 'random', and 'ordered'.
+backend:
+  name: "random"
+  kwargs:
+    source_path: 'data/highdim_features.npy'
+    seed: 800
+
+
+# Define the dimensionality reductions that the user can use
+dim_reductions:
+  umap:
+    n_components: 2
+    n_neighbors: 15
+    normalize: true
+    metric: "cosine"
+  pca:
+    n_components: 2
+  tsne:
+    n_components: 2
+    perplexity: 30
+    init: "pca"
+    default: true
+
+
+# Define the widgets that are displayed on the application
+# Each widget defines its name, type, position and possible keyword arguments.
+# These arguments should always contain either 'source_dirs' or 'source_path'
+# argument, which contain a list of paths pointing the data source that the
+# widget should display.
+widgets:
+  - name: "video_v1"
+    wtype: "video"
+    position: 
+      row: 0
+      col: 0
+      rowspan: 20
+      colspan: 16
+    kwargs:
+      auto_play: true
+      looped_play: true
+      source_path: 'data/long_video.mp4'
+      clip_length_s: 2.30769230769
+      overlap_s: 1.1538461538462
+      overhead_before_clip_ms: 900
+      overhead_after_clip_ms: 100
+      id_mapping_numpy_file: 'data/id_mapping_file.npy'
+
+  - name: "waveform_v1"
+    wtype: "waveform"
+    position:
+      row: 20
+      col: 1
+      rowspan: 12
+      colspan: 6
+    kwargs:
+      source_path: 'data/channelwise_waveforms_gyroscope.npy'
+      sr: 52
+      group_waveform_channels_into_groups_of: 3
+      show_xaxis_label: false
+      show_legend: false
+      show_xaxis_ticks: false
+      plot_titles: {0: 'RArm gyro',
+                    1: 'LArm gyro',
+                    2: 'RLeg gyro',
+                    3: 'LLeg gyro'}
+      plot_title_fontsize: "8pt"
+      plot_spacing: 0
+      waveform_thickness: 2
+      set_ylim_automatically: false
+      ylim_min_value: -2.0
+      ylim_max_value: 2.0
+      replace_yticklabels_with_plot_titles: true
+      lock_waveform_plots: true
+      hide_autorange_button: true
+      colors: ["#8516D1", "#3BAA32", "#2FBEEF"]
+
+  - name: "waveform_v2"
+    wtype: "waveform"
+    position:
+      row: 20
+      col: 9
+      rowspan: 12
+      colspan: 6
+    kwargs:
+      source_path: 'data/channelwise_waveforms_accelerometer.npy'
+      sr: 52
+      group_waveform_channels_into_groups_of: 3
+      show_xaxis_label: false
+      show_legend: false
+      show_xaxis_ticks: false
+      plot_titles: {0: 'RArm acc',
+                    1: 'LArm acc',
+                    2: 'RLeg acc',
+                    3: 'LLeg acc'}
+      plot_title_fontsize: "8pt"
+      plot_spacing: 0
+      waveform_thickness: 2
+      set_ylim_automatically: false
+      ylim_min_value: -2.0
+      ylim_max_value: 2.0
+      replace_yticklabels_with_plot_titles: true
+      lock_waveform_plots: true
+      hide_autorange_button: true
+      colors: ["#1171BE", "#DD5400", "#EDB120"]
+
+  - name: "scatter_v0"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 16
+      rowspan: 32
+      colspan: 16
+    kwargs:
+      source_path: 'data/highdim_features.npy'
+      base_marker_size: 1
+      colors: ["#0b06b8", "#ffea00", "#048013", "#D95319", "#0b06b8", "#46f0f0", "#911eb4", "#d2f53c", "#EDB120", "#000000"]

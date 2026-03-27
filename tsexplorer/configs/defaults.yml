@@ -1,0 +1,11 @@
+window:
+  width: 800
+  height: 600
+application-font:
+  size: null
+  color: null
+label-font:
+  size: "14px"
+  color: "#000"
+tick-font:
+  size: null

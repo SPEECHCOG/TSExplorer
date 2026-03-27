@@ -1,0 +1,264 @@
+# ========== TEMPLATE CONFIGURATION ========
+# This is a template configuration for TSExplorer. This contains all possible
+# options, and explanations on what each variable does.
+
+# ======= GLOBAL OPTIONS ======
+# Version -> Used only internally, DO NOT CHANGE
+version: 1.0.0
+
+
+# The name of the annotator. Shown when exporting the annotations
+annotator: annotator1
+
+# Labels: List of possible options the annotator can choose from. Should be 
+# unique
+labels: 
+    - "option1"
+    - "option2"
+    - "option3"
+    - "option4"
+
+
+# ===== BACKEND =====
+# This section defines the algorithm which is used to select samples.
+# - name (Required): Specifies the algorithm. Can be either "farthest-first" or 
+# "random"
+# -kwargs:
+#   - source_path (Required): Path to a "signal level" presentation of the
+#   data. The first dimension should indicate the amount of samples. Expected
+#   filetype: .npy
+#   - cluster_id_path (Optional): Path to a file containing the clustering ids
+#   for each sample (and thus should have shape (n-samples, )). The ids should
+#   be integers. Expected filetype: .npy
+backend:
+  name: "farthest-first"
+  kwargs:
+    source_path: "path/to/data.npy"
+    cluster_id_path: "path/to/cluster_ids/ids.npy"
+
+
+# ====== DIMENSIONALITY REDUCTION ======
+# This section defines the dimensionality reduction algorithms one can use to
+# plot the data as a scatter plot. The default value can be specified with 
+# 'default: true' property. If the default value is not explicitly set, the 
+# first algorithm will be used as default. 
+# Currently supported values: "umap", "pca" and "tsne"
+# NOTE: At least one option must be specified
+dim_reductions:
+  # Umap options -> All options from 
+  # https://umap-learn.readthedocs.io/en/latest/api.html should work
+  # NOTE: precomputed_knn should be a path to a pickle file that contains
+  # the precomputed knn values.
+  # NOTE: The 'n_components' should always be 2 (as the visualization is 2D)
+  # The setup below contains the common options. 
+  umap:
+    n_components: 2
+    n_neighbors: 15
+    normalize: true
+    metric: "cosine"
+
+  # PCA -> All options from 
+  # https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+  # should work. 
+  # NOTE: The 'n_components' should always be 2 (As the visualization is 2D)
+  pca:
+    n_components: 2
+
+  # TSNE -> All options from
+  # https://scikit-learn.org/stable/modules/generated/sklearn.manifold.TSNE.html
+  # should work.
+  # In this case, the tsne is explicitly set as default, otherwise umap would
+  # be the default transformation.
+  # NOTE: The 'n_components' should always be 2 (as the visualization is 2D)
+  tsne:
+    default: true
+    n_components: 2
+    perplexity: 30
+    init: "pca"
+
+
+# ========== WIDGETS ============
+# Define list of widgets that will be used to display the data to the user.
+# Each widget contains at least the following keys:
+# - name (Required): A UNIQUE name for the given widget. Not shown to the user.
+# - wtype (Required): The type of the widget. Currently available types are
+#   "audio", "scatter", "spectrogram", "video", "waveform"
+# - position (Required): The position of the application in a grid. Consists
+#   of four keys. Row and col specify the parent location on the grid
+#   (indexing starts from 0), and rowspan and colspan specify how tall / wide
+#   the widget is.
+#
+# - EXAMPLE:  
+# Assume the following grid
+# +---------+--------+
+# | (0, 0)  | (0, 1) |
+# +---------+--------+
+# | (1, 0)  | (1, 1) |
+# +---------+--------+
+# | (2, 0)  | (2, 1) |
+# +---------+--------+
+#  Specifying the position with row 1, col 1, rowspan 1 colspan 2 would 
+#  set the widget to take the lower left corner of the grid
+#
+#  NOTE: The grid is built dynamically, based on specified widget locations.
+#  In other words, the grid has only so many columns and rows than the
+#  specified widgets require.
+
+widgets:
+  # **audio**: Creates an audio player with simple three-button controls
+  # kwargs:
+  #   source_dirs (Required): The path to the folder containing the
+  #   audio-files. All common codecs should work just fine.
+  #   auto_play (Optional): If set to True, the audio starts playing
+  #   automatically when starting a new sample. Default False.
+  - name: "audio_v1"
+    wtype: "audio"
+    position:
+      row: 2
+      col: 0
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      auto_play: True
+      source_dirs:
+          - "path/to/audio_files"
+  
+  # **scatter**: Plots a 2D visualization of the given dataset.
+  # kwargs:
+  #   source_path (Required): Path to a file containing the data to visualize.
+  #     Expected filetype: '.npy'
+  #   colors (Optional): List of Hex color codes used for displaying data
+  #   points with different annotations. If the number of colors is less than
+  #   the number of labels + 2 (+2 for unlabeled and selected samples), the 
+  #   same colors will be reused.
+  - name: "scatter_v0"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 1
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      source_path: "path/to/features.npy"
+  
+  # **spectrogram**: Creates a spectrogram widget that displays the given data
+  # in mel-scale. 
+  # kwargs:
+  #   source_dirs (Required): Path to a directory containing the calculated 
+  #   features. Expected file type: '.npy'
+  #   n_mel (Required): The number of mel-bins
+  #   hop_ms (Required): The hop-length between windows in MILLISECONDS
+  #   sr (Required): The sampling rate of the signal.
+  - name: "spectrogram_v1"
+    wtype: "spectrogram"
+    position: 
+      row: 1 
+      col: 1
+      rowspan: 2
+      colspan: 1
+    kwargs:
+      n_mel: 40
+      hop_ms: 10
+      sr: 16000
+      source_dirs:
+        - "path/to/feature_dir/"
+  
+  # **video**: Creates a video player with simple three-button controls. 
+  # NOTE: Not recommended to be used in conjunction with the audio, as there
+  # is no volume control.
+  # kwargs:
+  #   source_path (Required): The path to the video file.
+  #   clip_length_s (Required): The length of one sample clip in SECONDS
+  #   overlap_s (Required): The amount of time (in SECONDS) each sample clip 
+  #     will "overlap" with other samples. For example, if overlap_s is set to
+  #     0.5, each sample plays from starting-time - 0.5s to starting-time
+  #     + clip_length + 0.5s).
+  #   auto_play (Optional): If set to True, each video clip will start playing
+  #   immediately after a new sample is loaded. Default False
+  #
+  - name: "video_v1"
+    wtype: "video"
+    position: 
+      row: 2
+      col: 0
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      auto_play: False 
+      source_path: "path/to/video.mp4"
+      clip_length_s: 5
+      overlap_s: 0.3
+  
+  # **waveform**: Used to display time-series data in its "original form".
+  # kwargs:
+  #   source_dirs (Required): List of source directories that contain the data,
+  #   each sample in its own file. If multiple paths are given, all of them
+  #   will be displayed on their own containers. The files will be processed
+  #   in alphabetical order.
+  #   map_sources (Optional): As mentioned in 'source_dirs', each specified 
+  #   directory/channel will be displayed separately by default. To display 
+  #   multiple signals on top of each other, one can map the directories to same
+  #   components using this value. Note that indexing starts from 0. Each
+  #   directory MUST be mapped to some index. If a single numpy array is used,
+  #   the channels can be addressed with keys channel_i, where i starts from 1. 
+  #   See below for example. 
+  #   labels (Optional): Give each channel a customized label name. If 
+  #   a list of directories are specified, use the name of directories to
+  #   specify the custom labels. If a single numpy array is used, 
+  #   use keys 'channel_i' (i: 1 -> n) to specify the custom labels
+  #   sr (Optional): The sampling rate of the signals. __MUST__ be specified
+  #   if a numpy file is used as data-source. Otherwise is ignored.
+  
+  - name: "waveform_v1"
+    wtype: "waveform"
+    position:
+      row: 0
+      col: 0
+      rowspan: 2
+      colspan: 1
+    kwargs:
+      source_dirs:
+        - "data/wav_files_1"
+        - "data/wav_files_2" 
+        - "data/wav_files_3"
+      # Display first two samples on the same plot, but the third one 
+      # is plotted separately.
+      map_sources:
+        "data/wav_files_1": 0
+        "data/wav_files_2": 0
+        "data/wav_files_3": 1
+      labels:
+        "data/wav_files_1": "heartbeat"
+        "data/wav_files_2": "velocity"
+        "data/wav_files_3": "acceleration"
+
+  # Or with a numpy array
+  - name: "waveform_v2"
+    wtype: "waveform"
+    position:
+      row: 0
+      col: 0
+      rowspan: 2
+      colspan: 1
+    kwargs:
+      source_path: "path/to/data.npy"
+      sr: 90
+      
+      # e.g. if the array contained 3 channels, and you would want to plot 
+      # first two on the same plot, and one on a second plot
+      map_sources:
+        "channel_1": 0
+        "channel_2": 0
+        "channel_3": 1
+    
+      # Specify the custom labels
+      labels:
+        "channel_1": "heartbeat"
+        "channel_2": "velocity"
+        "channel_3": "acceleration"
+
+
+
+
+  
+
