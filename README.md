@@ -2,17 +2,17 @@
 
 This repository contains a graphical user interface (GUI)-based interactive data annotation and visualization tool for time-series data called **Time-Series Explorer (TSExplorer)**. TSExplorer visualizes the entire dataset as a 2D scatter plot and allows annotators to freely explore complementary 2D representations of the underlying high-dimensional data. The code is partially implemented using the official PySide bindings for Qt6.
 
-TSExplorer has been used in the following publication (**NOTE: publication venue not yet confirmed!**):
-[E. Vaaras, M. Airaksinen, and O. Räsänen, "Evaluating Interactive 2D Visualization as a Sample Selection Strategy for Biomedical Time-Series Data Annotation", _(publication venue will be updated here)_](www.herewillbethelinktothepaper.com).
+TSExplorer has been used in the following publication (**NOTE: arXiv pre-print only, publication venue not yet confirmed**):
+[E. Vaaras, M. Airaksinen, and O. Räsänen, "Evaluating Interactive 2D Visualization as a Sample Selection Strategy for Biomedical Time-Series Data Annotation", _(arXiv pre-print, publication venue will be updated here later)_](https://arxiv.org/abs/2603.26592).
 
-If you use the present code or its derivatives, please cite the [repository URL](https://github.com/SPEECHCOG/TSExplorer) and/or the [aforementioned publication](www.herewillbethelinktothepaper.com).
+If you use the present code or its derivatives, please cite the [repository URL](https://github.com/SPEECHCOG/TSExplorer) and/or the [aforementioned publication](https://arxiv.org/abs/2603.26592).
 
 <ins>**Please note**</ins> that, while some features will still be added to TSExplorer, the code is not under constant maintenance. If you encounter any issues with the code or would like to request additional features, please contact [Einari Vaaras](https://www.tuni.fi/en/people/einari-vaaras).
 
 
 | ![An example screenshot of TSExplorer](figures/tsexplorer_maiju_posture_example_image.png) |
 |:--:|
-| *Figure 1: An example screenshot of TSExplorer (from [Vaaras et al. (2026)](www.herewillbethelinktothepaper.com)).* |
+| *Figure 1: An example screenshot of TSExplorer (from [Vaaras et al. (2026)](https://arxiv.org/abs/2603.26592)).* |
 
 
 ## Installation
