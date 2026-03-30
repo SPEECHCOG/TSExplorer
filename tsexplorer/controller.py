@@ -314,7 +314,7 @@ class Controller(QObject):
             values = database.query(
                 self._conn,
                 (f"SELECT sid, label FROM {table_name} "
-                 f"WHERE status = 'unlabeled' "
+                 f"WHERE status = '{SampleState.UNLABELED.name}' "
                  "ORDER BY ordernumber"),
                 columns=["sid", "label"]
             )
