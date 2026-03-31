@@ -15,10 +15,10 @@ labels:
 # Define the backend for selecting the samples. Currently supported values are 
 # 'farthest-first', 'random', and 'ordered'.
 backend:
-  name: "random"
+  name: 'farthest-first'
   kwargs:
-    source_path: 'data/highdim_features.npy'
-    seed: 800
+    source_path: 'data/highdim_features_simulated_imu_data.npy'
+    precomputed_index_path: 'data/simulated_imu_data_precomputed_faft_indices.npy'
 
 
 # Define the dimensionality reductions that the user can use
@@ -53,12 +53,11 @@ widgets:
     kwargs:
       auto_play: true
       looped_play: true
-      source_path: 'data/long_video.mp4'
+      source_path: 'data/video_simulated_imu_data.mp4'
       clip_length_s: 2.30769230769
       overlap_s: 1.1538461538462
-      overhead_before_clip_ms: 900
+      overhead_before_clip_ms: 100
       overhead_after_clip_ms: 100
-      id_mapping_numpy_file: 'data/id_mapping_file.npy'
 
   - name: "waveform_v1"
     wtype: "waveform"
@@ -68,7 +67,7 @@ widgets:
       rowspan: 12
       colspan: 6
     kwargs:
-      source_path: 'data/channelwise_waveforms_gyroscope.npy'
+      source_path: 'data/channelwise_waveforms_gyroscope_simulated_imu_data.npy'
       sr: 52
       group_waveform_channels_into_groups_of: 3
       show_xaxis_label: false
@@ -97,7 +96,7 @@ widgets:
       rowspan: 12
       colspan: 6
     kwargs:
-      source_path: 'data/channelwise_waveforms_accelerometer.npy'
+      source_path: 'data/channelwise_waveforms_accelerometer_simulated_imu_data.npy'
       sr: 52
       group_waveform_channels_into_groups_of: 3
       show_xaxis_label: false
@@ -126,6 +125,6 @@ widgets:
       rowspan: 32
       colspan: 16
     kwargs:
-      source_path: 'data/highdim_features.npy'
-      base_marker_size: 1
+      source_path: 'data/highdim_features_simulated_imu_data.npy'
+      base_marker_size: 7
       colors: ["#0b06b8", "#ffea00", "#048013", "#D95319", "#0b06b8", "#46f0f0", "#911eb4", "#d2f53c", "#EDB120", "#000000"]
