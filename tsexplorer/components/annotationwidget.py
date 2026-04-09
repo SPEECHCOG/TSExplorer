@@ -319,12 +319,8 @@ class AnnotationWidget(QWidget):
         self._static_widgets["label_box"] = label_box
         top_layout.addWidget(label_box)
 
-        # Check if there are any scatter widgets that actually use the 
-        # dim-reductions
-        has_scatters = any(
-                wconfig.get("wtype") == WidgetType.SCATTER for wconfig in
-                user_settings.widgets
-        )
+        # Check if there are any scatter widgets that actually use dimensionality reductions
+        has_scatters = any(wconfig.get("wtype") == WidgetType.SCATTER.value for wconfig in user_settings.widgets)
 
         if has_scatters:
             dim_reduction_box = QComboBox()
@@ -403,7 +399,22 @@ class AnnotationWidget(QWidget):
         for row in range(max_row + 1):
             stretch = row_stretch_map.get(row, 1)
             middle_layout.setRowStretch(row, stretch)
+        
+        # Iterate over scatter widgets
+        scatter_widgets = self.get_scatter_widgets().values()
+        
+        # Select the first scatter widget that has multiple modalities
+        scatter_mod_widget = next((w for w in scatter_widgets if w.multiple_modalities), None)
+                
+        if scatter_mod_widget:
+            modality_box = QComboBox()
+            for name in scatter_mod_widget._modality_names:
+                modality_box.addItem(name)
 
+            modality_box.currentIndexChanged.connect(self._on_modality_changed)
+            self._static_widgets["modality_box"] = modality_box
+            top_layout.insertWidget(2, modality_box) # Insert on the left side of the other drop-down menus
+        
         # Add the components to the main layout
         layout = QVBoxLayout()
         layout.addLayout(top_layout)
@@ -765,6 +776,23 @@ class AnnotationWidget(QWidget):
 
         self.sign_widget_ready.emit()
     
+    @Slot(int)
+    def _on_modality_changed(self, idx: int):
+        ''' Called when data modality is changed '''
+        # Update modality in all scatter widgets
+        for name, sc in self.get_scatter_widgets().items():
+            if sc.multiple_modalities:
+                sc.set_modality(idx)
+
+                # Trigger the dimensionality reduction
+                algo_name, config = self._get_current_dim_reduction_config()
+
+                self.sign_request_dim_reduction.emit(
+                    name,        # widget name
+                    sc.file,     # active modality file
+                    algo_name, 
+                    config
+                )
     
     def eventFilter(self, obj, event):
         '''

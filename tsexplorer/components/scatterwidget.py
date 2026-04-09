@@ -74,13 +74,18 @@ class ScatterWidget(QWidget):
             [str], error=("Missing 'labels'! This is likely a internal bug ",
                           "and not an user error!")
         ),
-        "source_path": str,
+        Optional("source_path", default=None): str,
         Optional(
             "colors", default=None
             ): Schema([Regex("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")]),
 
         Optional("cmap", default=None): str,
         Optional("base_marker_size", default=10): int,
+        Optional("plot_title", default=None): str,
+        Optional("plot_title_fontsize", default="12pt"): str,
+        Optional("multiple_modalities", default=False): bool,
+        Optional("source_paths", default=None): [str],
+        Optional("modality_names", default=None): [str],
     })
 
     def __init__(
@@ -120,16 +125,40 @@ class ScatterWidget(QWidget):
         # Validate the keyword arguments
         kwargs = self._KWARGS_SCHEMA.validate(kwargs)
 
+        # Initialize modality index
+        self._active_modality = 0
+
+        self.multiple_modalities = kwargs.get("multiple_modalities", False)
+        
+        # Check if we want to display multiple data modalities
+        if self.multiple_modalities:
+            if not kwargs.get("source_paths"):
+                raise ValueError("When multiple_modalities=True, 'source_paths' is required.")
+            if not kwargs.get("modality_names"):
+                raise ValueError("When multiple_modalities=True, 'modality_names' is required.")
+
+            self._source_paths = kwargs["source_paths"]
+            self._modality_names = kwargs["modality_names"]
+
+            if len(self._source_paths) < 2:
+                raise ValueError("multiple_modalities=True requires at least two source_paths.")
+            if len(self._modality_names) != len(self._source_paths):
+                raise ValueError("'modality_names' must match number of 'source_paths'.")
+            kwargs["source_path"] = self._source_paths[0]
+        else:
+            # We display only a single modality
+            if not kwargs.get("source_path"):
+                raise ValueError("When multiple_modalities=False, 'source_path' is required.")
+
+            self._source_paths = [kwargs["source_path"]]
+            self._modality_names = ["default"]
+
         self._props: Dict[str, Any] = kwargs
         
         self.base_marker_size = self._props.get("base_marker_size", 10)
-
-        self._file: Optional_t[str] = None
-        file = self._props.get("source_path", None)
-        if file is not None and isinstance(file, list):
-            self._props["source_path"] = file[0]
-        elif file is not None and isinstance(file, str):
-            self._props["source_path"] = file
+        
+        self._plot_title = kwargs.get("plot_title")
+        self._plot_title_fontsize = kwargs.get("plot_title_fontsize")
 
         cmap: str = kwargs.get("cmap")
         colors = kwargs.pop("colors")
@@ -197,13 +226,24 @@ class ScatterWidget(QWidget):
 
     @property
     def file(self) -> Optional_t[str]:
-        '''Returns the file used for the current dim reduction'''
+        '''
+        Returns the file used for the current dimensionality reduction. If multiple modalities are enabled, return the
+        active modality path. Otherwise, return the single source_path.
+        '''
+        if self.multiple_modalities:
+            return self._source_paths[self._active_modality]
         return self._props["source_path"]
 
-    @file.setter
-    def file(self, fpath: str):
-        ''' Sets the currently used path '''
-        self._props["source_path"] = fpath
+    def set_modality(self, modality_index: int):
+        ''' Sets the currently active modality. '''
+        
+        if not self.multiple_modalities:
+            return
+            
+        if modality_index < 0 or modality_index >= len(self._source_paths):
+            raise IndexError("Invalid modality index")
+            
+        self._active_modality = modality_index
 
     def set_data(self, data: npt.NDArray):
         '''
@@ -311,6 +351,11 @@ class ScatterWidget(QWidget):
 
             self._scatters[SampleState.UNLABELED].setData(x, y)
             self._canvas.getPlotItem().showGrid(x=True, y=True)
+            
+            # If the plot title was specified, add it
+            if self._plot_title is not None:
+                self._canvas.getPlotItem().setTitle(self._plot_title, size=self._plot_title_fontsize,
+                                                    color=self._font_opts["label"].get("color", "black"))
 
             # If the tick-fontsize was specified, use it
             if self._font_opts["ticks"]["fontsize"] is not None:

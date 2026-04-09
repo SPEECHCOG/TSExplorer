@@ -337,6 +337,8 @@ class AssetManager:
                     sources[wname] = tmp
             elif "numpy_path" in kwargs:
                 sources[wname] = kwargs.get("numpy_path")
+            elif "source_paths" in kwargs:
+                sources[wname] = kwargs.get("source_paths")
         return sources
 
     def _determine_loaders(
@@ -365,6 +367,9 @@ class AssetManager:
             elif "source_path" in kwargs:
                 source = kwargs.get("source_path")
                 sample_path = pathlib.Path(source)
+            elif "source_paths" in kwargs:
+                source = kwargs.get("source_paths")
+                sample_path = pathlib.Path(source[0])
 
             # Audio and video are special cases, as they take in the filepaths,
             # and handle the loading by themselves

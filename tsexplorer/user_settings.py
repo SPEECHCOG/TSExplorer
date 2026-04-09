@@ -305,11 +305,12 @@ class UserSettings(QObject):
 
             has_sources = kwargs is not None and ("source_dirs" in kwargs
                                                   or "numpy_path" in kwargs
+                                                  or "source_paths" in kwargs
                                                   or "source_path" in kwargs)
             if not has_sources:
                 raise RuntimeError((f"Widget {name!r} is missing "
-                                    "'source_dirs' or 'source_path' from "
-                                    " 'kwargs'"))
+                                    "'source_dirs', 'numpy_path', 'source_paths', or 'source_path' from "
+                                    "'kwargs'"))
             # Check that the source directories actually have some files.
             if "source_dirs" in kwargs:
                 dirpaths = kwargs.get("source_dirs")
