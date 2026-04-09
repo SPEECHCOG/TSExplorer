@@ -1,0 +1,111 @@
+# This is the configuration file for the application
+version: 1.0.0
+
+# Define the name of the annotator and the labels for the annotation
+annotator: name_of_annotator
+labels: 
+    - "1: lots of noise"
+    - "2: some noise"
+    - "3: very little noise"
+    - "4: no noise"
+    - "5: N/A"
+
+# Define the backend for selecting the samples. Currently supported values are 
+# 'farthest-first', 'random', and 'ordered'.
+backend:
+  name: "ordered"
+  kwargs:
+    source_path: 'data/highdim_features_simulated_signal_data_1.npy'
+
+
+# Define the dimensionality reductions that the user can use
+dim_reductions:
+  umap:
+    n_components: 2
+    n_neighbors: 15
+    normalize: true
+    metric: "cosine"
+  pca:
+    n_components: 2
+  tsne:
+    n_components: 2
+    perplexity: 30
+    init: "pca"
+    default: true
+
+
+# Define the widgets that are displayed on the application
+# Each widget defines its name, type, position and possible keyword arguments.
+# These arguments should always contain either 'source_dirs' or 'source_path'
+# argument, which contain a list of paths pointing the data source that the
+# widget should display.
+widgets:
+
+  - name: "scatter_v1"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 0
+      rowspan: 20
+      colspan: 16
+    kwargs:
+      source_path: 'data/highdim_features_simulated_signal_data_1.npy'
+      base_marker_size: 10
+      plot_title: 'Feature set 1'
+      plot_title_fontsize: '20pt'
+
+  - name: "waveform_v1"
+    wtype: "waveform"
+    position:
+      row: 20
+      col: 1
+      rowspan: 12
+      colspan: 6
+    kwargs:
+      source_path: 'data/channelwise_waveforms_left_signal_simulated_data.npy'
+      sr: 50
+      show_legend: false
+      plot_titles: {0: 'Left signal, channel 1',
+                    1: 'Left signal, channel 2'}
+      plot_title_fontsize: "20pt"
+      plot_spacing: 0
+      waveform_thickness: 3
+      set_ylim_automatically: false
+      ylim_min_value: -1.5
+      ylim_max_value: 1.5
+      colors: ["#3BAA32", "#2FBEEF"]
+
+  - name: "waveform_v2"
+    wtype: "waveform"
+    position:
+      row: 20
+      col: 9
+      rowspan: 12
+      colspan: 6
+    kwargs:
+      source_path: 'data/channelwise_waveforms_right_signal_simulated_data.npy'
+      sr: 50
+      show_legend: false
+      plot_titles: {0: 'Right signal, channel 1',
+                    1: 'Right signal, channel 2'}
+      plot_title_fontsize: "20pt"
+      plot_spacing: 0
+      waveform_thickness: 3
+      set_ylim_automatically: false
+      ylim_min_value: -1.5
+      ylim_max_value: 1.5
+      colors: ["#DD5400", "#EDB120"]
+
+  - name: "scatter_v2"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 16
+      rowspan: 32
+      colspan: 16
+    kwargs:
+      source_path: 'data/highdim_features_simulated_signal_data_2.npy'
+      base_marker_size: 10
+      plot_title: 'Feature set 2'
+      plot_title_fontsize: '20pt'
+

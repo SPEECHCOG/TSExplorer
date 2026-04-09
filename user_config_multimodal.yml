@@ -1,0 +1,77 @@
+# This is the configuration file for the application
+version: 1.0.0
+
+# Define the name of the annotator and the labels for the annotation
+annotator: name_of_annotator
+labels: 
+    - "1: very nice"
+    - "2: nice"
+    - "3: a little bit nice"
+    - "4: neutral"
+    - "5: slightly not very nice"
+    - "6: not very nice"
+    - "7: N/A"
+
+# Define the backend for selecting the samples. Currently supported values are 
+# 'farthest-first', 'random', and 'ordered'.
+backend:
+  name: "random"
+  kwargs:
+    source_path: 'data/highdim_features_simulated_audio_data_multimodal.npy'
+    seed: 600
+
+
+# Define the dimensionality reductions that the user can use
+dim_reductions:
+  umap:
+    n_components: 2
+    n_neighbors: 15
+    normalize: true
+    metric: "cosine"
+  pca:
+    n_components: 2
+  tsne:
+    n_components: 2
+    perplexity: 30
+    init: "pca"
+    default: true
+
+
+# Define the widgets that are displayed on the application
+# Each widget defines its name, type, position and possible keyword arguments.
+# These arguments should always contain either 'source_dirs' or 'source_path'
+# argument, which contain a list of paths pointing the data source that the
+# widget should display.
+widgets:
+  - name: "video_v1"
+    wtype: "video"
+    position: 
+      row: 0
+      col: 0
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      auto_play: true
+      looped_play: true
+      source_path: 'data/video_simulated_imu_data.mp4'
+      clip_length_s: 2.30769230769
+      overlap_s: 1.1538461538462
+      overhead_before_clip_ms: 100
+      overhead_after_clip_ms: 100
+      id_mapping_numpy_file: "data/id_mapping_simulated_data_multimodal.npy"
+
+  - name: "scatter_v0"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 1
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      multiple_modalities: true
+      modality_names: ["Audio features", "Video features", "Audio + video"]
+      source_paths:
+        - "data/highdim_features_simulated_audio_data_multimodal.npy"
+        - "data/highdim_features_simulated_video_data_multimodal.npy"
+        - "data/highdim_features_simulated_audio_and_video_data_multimodal.npy"
+      base_marker_size: 7
