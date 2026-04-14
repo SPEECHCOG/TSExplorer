@@ -1,0 +1,64 @@
+# This is the configuration file for the application
+version: 1.0.0
+
+# Define the name of the annotator and the labels for the annotation
+annotator: name_of_annotator
+labels: 
+    - "1: ball hits a wall"
+    - "2: ball does not hit a wall"
+    - "3: impossible to deduce"
+
+# Define the backend for selecting the samples. Currently supported values are 
+# 'farthest-first', 'random', and 'ordered'.
+backend:
+  name: "random"
+  kwargs:
+    source_path: 'data/highdim_features_simulated_videoclip_data.npy'
+    seed: 500
+
+
+# Define the dimensionality reductions that the user can use
+dim_reductions:
+  umap:
+    n_components: 2
+    n_neighbors: 2 # NOTE THAT this is not a very reasonable value (selected for this five-sample demo dataset)
+    normalize: true
+    metric: "cosine"
+  pca:
+    n_components: 2
+  tsne:
+    n_components: 2
+    perplexity: 2 # NOTE THAT this is not a very reasonable value (selected for this five-sample demo dataset)
+    init: "pca"
+    default: true
+
+
+# Define the widgets that are displayed on the application
+# Each widget defines its name, type, position and possible keyword arguments.
+# These arguments should always contain either 'source_dirs' or 'source_path'
+# argument, which contain a list of paths pointing the data source that the
+# widget should display.
+widgets:
+  - name: "video_v1"
+    wtype: "video"
+    position: 
+      row: 0
+      col: 0
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      auto_play: true
+      looped_play: true
+      source_dirs:
+        - 'data/varying_length_videos'
+
+  - name: "scatter_v0"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 1
+      rowspan: 1
+      colspan: 1
+    kwargs:
+      source_path: "data/highdim_features_simulated_videoclip_data.npy"
+      base_marker_size: 25

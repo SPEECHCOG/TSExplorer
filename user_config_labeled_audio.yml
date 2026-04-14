@@ -1,0 +1,65 @@
+# This is the configuration file for the application
+version: 1.0.0
+
+# Define the name of the annotator and the labels for the annotation
+annotator: name_of_annotator
+labels: 
+    - "1: pleasant"
+    - "2: non-pleasant"
+    - "3: N/A"
+
+# Here we have file containing a set of labels for readily-labeled samples
+base_labels_numpy_file: 'data/simulated_audio_base_labels.npy'
+
+# Define the backend for selecting the samples. Currently supported values are 
+# 'farthest-first', 'random', and 'ordered'.
+backend:
+  name: "ordered"
+  kwargs:
+    source_path: 'data/highdim_features_simulated_audio_data.npy'
+
+
+# Define the dimensionality reductions that the user can use
+dim_reductions:
+  umap:
+    n_components: 2
+    n_neighbors: 15
+    normalize: true
+    metric: "cosine"
+  pca:
+    n_components: 2
+  tsne:
+    n_components: 2
+    perplexity: 30
+    init: "pca"
+    default: true
+
+
+# Define the widgets that are displayed on the application
+# Each widget defines its name, type, position and possible keyword arguments.
+# These arguments should always contain either 'source_dirs' or 'source_path'
+# argument, which contain a list of paths pointing the data source that the
+# widget should display.
+widgets:
+  - name: "audio_v1"
+    wtype: "audio"
+    position: 
+      row: 0
+      col: 0
+      rowspan: 4
+      colspan: 1
+    kwargs:
+      auto_play: true
+      numpy_path: "data/wav_data_simulated_audio.npy"
+      sample_rate: 16000
+
+  - name: "scatter_v0"
+    wtype: "scatter"
+    position:
+      row: 0
+      col: 1
+      rowspan: 6
+      colspan: 2
+    kwargs:
+      source_path: "data/highdim_features_simulated_audio_data.npy"
+      base_marker_size: 7

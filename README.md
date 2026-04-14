@@ -41,11 +41,11 @@ tsexplorer --config-file <name_of_yml_configuration_file>
 ```
 in order to run TSExplorer. Using the former of these options requires having a configuration file named _user_config.yml_ in the same directory as TSExplorer (this file is already provided together with the package). In the latter option, _<name_of_yml_configuration_file>_ is a _.yml_ configuration file containing the settings you want to use with TSExplorer. By default, the configuration file _user_config.yml_ uses the a simulated dataset of multi-sensor inertial measurement unit (IMU) data.
 
-### Demo of multi-sensor IMU data with video
+### Demo 1: Multi-sensor IMU data with video
 
 | ![An example screenshot of TSExplorer during the multi-sensor IMU data demo](figures/tsexplorer_imu_data_demo_example_image.png) |
 |:--:|
-| *Figure 2: An example screenshot of TSExplorer during the multi-sensor IMU data demo.* |
+| *Figure 2: An example screenshot of TSExplorer during the multi-sensor IMU data demo (Demo 1).* |
 
 You can either use the command
 ```
@@ -60,18 +60,18 @@ in order to run a demo example of TSExplorer with randomly-generated multi-senso
   * A scatter plot visualizing randomly-generated 160-dimensional data in 2D. Each sample corresponds to approximately 2.3 seconds of IMU data.
   * A video widget (showing a randomly-generated sequence of a circle bouncing around).
 
-This demo contains a 5-minute sequence of simulated IMU data (sampling rate of 52 Hz), split into 120-sample frames (approximately 2.3 seconds each) with an overlap of 50% (60 samples). This leads to a demo dataset of 260 frames (samples) altogether.
+This demo contains a 5-minute sequence of simulated IMU data (sampling rate of 52 Hz), split into 120-sample frames (approximately 2.3 seconds each) with an overlap of 50% (60 samples). This leads to a demo dataset of 260 frames (samples) altogether. Inputting a single video file into TSExplorer is convenient if samples are of equal duration (i.e. TSExplorer handles the "splitting" of video data), since it is faster for the GUI to open a video only once and then seek a specific part of the video, in contrast to repeatedly having to open and close video files (see _Demo 6_ for an example of using TSExplorer with separate video files).
 
 When letting TSExplorer select samples for you (i.e. either pressing the "next sample" button or the _Enter_ key), this demo uses the farthest-first traversal (FAFT) algorithm. In the demo, the FAFT indices have been computed from the 2D t-SNE features using the Euclidean distance.
 
 Except for the MP4 video, all the data is stored into _.npy_ data matrices. See the configuration file _user_config.yml_ for further details.
 
 
-### Demo of multimodal features
+### Demo 2: Multimodal features
 
 | ![An example screenshot of TSExplorer during the multimodal data demo](figures/tsexplorer_multimodal_data_demo_example_image.png) |
 |:--:|
-| *Figure 3: An example screenshot of TSExplorer during the multimodal feature demo.* |
+| *Figure 3: An example screenshot of TSExplorer during the multimodal feature demo (Demo 2).* |
 
 You can use the command
 ```
@@ -82,7 +82,7 @@ in order to run a demo example of TSExplorer with randomly-generated multimodal 
   * A drop-down menu enabling switching between audio, video, and combined "audio + video" features.
   * A video widget (showing a randomly-generated sequence of a circle bouncing around).
 
-This demo contains a dataset of 90 randomly-generated samples, each corresponding to a video clip of approximately 2.3 seconds. The purpose of the demo is to exemplify the use of TSExplorer with multimodal features, as 2D visualizations of different features and their combinations may highlight different aspects of the data. When letting TSExplorer select samples for you (i.e. either pressing the "next sample" button or the _Enter_ key), this demo uses random sampling, i.e. the next sample is selected at random.
+This demo contains a dataset of 90 randomly-generated samples, each corresponding to a video clip of approximately 2.3 seconds. The purpose of the demo is to exemplify the use of TSExplorer with multimodal features, as 2D visualizations of different features and their combinations may highlight different aspects of the data. In a similar manner, TSExplorer can be used to visualize different sets of features within the same modality. When letting TSExplorer select samples for you (i.e. either pressing the "next sample" button or the _Enter_ key), this demo uses random sampling, i.e. the next sample is selected at random. Inputting a single video file into TSExplorer is convenient if samples are of equal duration (i.e. TSExplorer handles the "splitting" of video data), since it is faster for the GUI to open a video only once and then seek a specific part of the video, in contrast to repeatedly having to open and close video files (see _Demo 6_ for an example of using TSExplorer with separate video files).
 
 **Note that** the demo demonstrates the use of an ID mapping file _data/id_mapping_simulated_data_multimodal.npy_ that is used together with the video file. This file contains a list of integers that map the sample indices used by TSExplorer to the corresponding clip indices in the original video. This is useful when your data arrays and your video do not cover the same time span. For example, imagine you have:
   * A 10‑minute video
@@ -107,11 +107,11 @@ Except for the MP4 video, all the data is stored into _.npy_ data matrices. See 
 
 
 
-### Demo 1 of audio data (audio data in a single _.npy_ file)
+### Demo 3: Audio data in a single _.npy_ file
 
 | ![An example screenshot of TSExplorer during the audio data demo 1](figures/tsexplorer_audio_data_demo_single_npy_example_image.png) |
 |:--:|
-| *Figure 4: An example screenshot of TSExplorer during the first audio data demo (Demo 1 of audio data).* |
+| *Figure 4: An example screenshot of TSExplorer during the demo showing the use of the GUI with a single .npy audio file (Demo 3).* |
 
 You can use the command
 ```
@@ -124,17 +124,17 @@ in order to run a demo example of TSExplorer with randomly-generated audio data 
 This demo contains a dataset of 200 randomly-generated audio samples with a duration varying between 0.5 and 1.0 seconds. When letting TSExplorer select samples for you (i.e. either pressing the "next sample" button or the _Enter_ key), this demo uses random sampling, i.e. the next sample is selected at random. The audio WAV files are stored into a single _.npy_ object file, and the rest of the data are stored into _.npy_ data matrices. See the configuration file _user_config_audio.yml_ for further details.
 
 
-### Demo 2 of audio data (audio data as separate _.wav_ files)
+### Demo 4: Audio data as separate _.wav_ files
 
 | ![An example screenshot of TSExplorer during the audio data demo 2](figures/tsexplorer_audio_data_demo_separate_wav_example_image.png) |
 |:--:|
-| *Figure 5: An example screenshot of TSExplorer during the second audio data demo (Demo 2 of audio data).* |
+| *Figure 5: An example screenshot of TSExplorer during the demo showing the use of the GUI with separate audio files (Demo 4).* |
 
 You can use the command
 ```
 tsexplorer --config-file user_config_audio_separate_files.yml
 ```
-in order to run a demo example of TSExplorer with randomly-generated audio data (Figure 5). This demo contains a small subset (four samples) of the 200-sample audio described above in _Demo 1 of audio data_. This time, the audio data are stored as separate _.wav_ files in a separate folder. The demo shows:
+in order to run a demo example of TSExplorer with randomly-generated audio data (Figure 5). This demo contains a small subset (four samples) of the 200-sample audio described above in _Demo 3_. This time, the audio data are stored as separate _.wav_ files in a separate folder. The demo shows:
   * A scatter plot visualizing randomly-generated 128-dimensional data in 2D, each sample corresponding to an audio file with a duration between 0.5 and 1.0 seconds.
   * A visualization of two-channel audio data. Note that in the demo, the visualization for "Channel A" displays the actual sample, whereas the visualization for "Channel B" contains a random audio sample. These channel-wise samples are stored as separate _.npy_ files in separate folders.
   * A log-mel visualization of audio data. In the demo, this is a visualization for the actual audio sample, i.e. the sample shown in the "Channel A" visualization. The log-mel features are stored as separate _.npy_ files in a separate folder.
@@ -151,11 +151,11 @@ When letting TSExplorer select samples for you (i.e. either pressing the "next s
 This approach is fine with smaller datasets, but with larger datasets it is **highly recommended** to pre-compute the t-SNE, PCA, and UMAP 2D visualizations before running TSExplorer to reduce computational overhead (see the _data_ directory regarding file naming conventions).
 
 
-### Demo of multiple scatter plots
+### Demo 5: Multiple scatter plots
 
-| ![An example screenshot of TSExplorer during the audio data demo 2](figures/tsexplorer_multiscatter_demo_example_image.png) |
+| ![An example screenshot of TSExplorer during the multi-scatter demo](figures/tsexplorer_multiscatter_demo_example_image.png) |
 |:--:|
-| *Figure 6: An example screenshot of TSExplorer during the demo of multiple scatter plots.* |
+| *Figure 6: An example screenshot of TSExplorer during the demo of multiple scatter plots (Demo 5).* |
 
 You can use the command
 ```
@@ -172,6 +172,48 @@ This demo contains 100 signal samples altogether. When letting TSExplorer select
   2. Later on, if TSExplorer needs to use the same visualization algorithm, it loads the pre-computed _.npy_ file.
 
 This approach is fine with smaller datasets, but with larger datasets it is **highly recommended** to pre-compute the t-SNE, PCA, and UMAP 2D visualizations before running TSExplorer to reduce computational overhead (see the _data_ directory regarding file naming conventions).
+
+
+### Demo 6: Separate video files
+
+| ![An example screenshot of TSExplorer during the separate video file demo](figures/tsexplorer_separate_video_file_demo_example_image.png) |
+|:--:|
+| *Figure 7: An example screenshot of TSExplorer during the demo of separate video files (Demo 6).* |
+
+You can use the command
+```
+tsexplorer --config-file user_config_video_separate_files.yml
+```
+in order to run a demo example showing the use of TSExplorer with separate video files (Figure 7). This demo simulates annotating video in the case of having a folder containing multiple video files, and it shows:
+  * Five randomly-generated 12-dimensional samples, each corresponding to a video clip.
+  * A video widget displaying randomly-generated video clips (1-3 seconds).
+
+This approach (multiple video files in a directory) is convenient if the video clips have different durations. However, note that it is faster for the GUI to open a video only once and then seek a specific part of the video, as opposed to repeatedly having to open and close video files which inherently causes system lag. If video clips are of equal duration, then it is highly recommended to input only a single video and let TSExplorer handle the "splitting" of the video (see _Demo 1_ and _Demo 2_ as examples). See the configuration file user_config_video_separate_files.yml_ for further details.
+
+**Note that**, for demonstration purposes, this demo does not use pre-computed _.npy_ files for the 2D visualizations. Instead, it computes the t-SNE, PCA, and UMAP 2D visualizations "on-the-fly":
+  1. When first using a given visualization algorithm (t-SNE/PCA/UMAP), TSExplorer computes the 2D visualization and saves it as a _.npy_ file.
+  2. Later on, if TSExplorer needs to use the same visualization algorithm, it loads the pre-computed _.npy_ file.
+
+This approach is fine with smaller datasets, but with larger datasets it is **highly recommended** to pre-compute the t-SNE, PCA, and UMAP 2D visualizations before running TSExplorer to reduce computational overhead (see the _data_ directory regarding file naming conventions).
+
+
+### Demo 7: Visualizing already-labeled data
+
+| ![An example screenshot of TSExplorer during the demo of visualizing already-labeled data](figures/tsexplorer_already_labeled_data_demo_example_image.png) |
+|:--:|
+| *Figure 8: An example screenshot of TSExplorer during the demo showing the visualization of already-labeled data (Demo 7).* |
+
+You can use the command
+```
+tsexplorer --config-file user_config_labeled_audio.yml
+```
+in order to run a demo example of TSExplorer showcasing already-labeled randomly-generated audio data (Figure 8). This demo is mostly the same as _Demo 3_, but it simulates visualizing already-labeled audio data using a _.npy_ object file _data/simulated_audio_base_labels.npy_ that contains the labels of 150 samples (200 samples in total, so 50 samples are unlabeled). This is to demonstrate the use of TSExplorer e.g. for:
+  * Visualizing already-labeled samples.
+  * Annotating additional samples for partially-annotated datasets.
+  * Modifying the labels of already-labeled samples, e.g. for data quality assurance.
+
+When letting TSExplorer select samples for you (i.e. either pressing the "next sample" button or the _Enter_ key), this demo uses the ordered selector, i.e. the next sample is selected from the ordered list based on the file names/indices. See the configuration file _user_config_labeled_audio.yml_ for further details.
+
 
 
 ## TSExplorer user manual
