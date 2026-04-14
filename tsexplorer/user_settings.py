@@ -17,6 +17,7 @@ settings_schema = Schema({
     Optional("filepath", default=None): str,
     Optional("save_path", default=None): str,
     Optional("session_path", default=None): str,
+    Optional("base_labels_numpy_file", default=None): Or(str, None),
     "labels": [str],
     "dim_reductions": Schema({}, ignore_extra_keys=True),
     "backend": Schema({

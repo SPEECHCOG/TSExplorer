@@ -101,6 +101,8 @@ class Window(QMainWindow):
 
             # =========== Load settings && open connection to db ========
             self._settings: UserSettings = self._load_settings(config_path)
+            labels = self._settings.labels
+            base_labels_numpy_file = self._settings._data.get("base_labels_numpy_file", None)
             n_samples = self._settings.get_total_amount_of_samples()
             self._logger.debug(f"Dataset contains {n_samples} samples in total")
             # Create unique path for the session.
@@ -118,7 +120,7 @@ class Window(QMainWindow):
             # Store the datapath in the settings.
             self._settings["session_path"] = str(session_path)
 
-            self._controller = Controller(session_path, n_samples, parent=self)
+            self._controller = Controller(session_path, n_samples, parent=self, labels=labels, base_labels_numpy_file=base_labels_numpy_file, session_loaded=False)
             self._logger.info("Created controller")
 
             # ===== Widgets ======
@@ -648,6 +650,8 @@ class Window(QMainWindow):
         self._logger.debug(f"Setting: {prettify_map(self._settings.to_dict())}")
         self._logger.info("Loaded settings")
         self._controller.deserialize(session["controller"])
+        self._controller._session_loaded = True
+        self._controller._base_labels_file = None
         self._logger.info("Loaded controller")
         self._backend.deserialize(session["backend"])
         self._logger.info("Loaded backend")
@@ -678,6 +682,7 @@ class Window(QMainWindow):
         # Manually update the state of the application
         self._controller.on_sync_state()
         self._controller.was_updated = False
+        
 
     @Slot(str, str)
     def _show_dialog(self, msg: str, kind: str = "critical") -> None:

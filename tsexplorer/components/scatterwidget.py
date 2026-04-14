@@ -698,10 +698,18 @@ class ScatterWidget(QWidget):
         payload: List[Tuple[str, str, str]]
         '''
 
-        # This is practically the same thing as in 'on_sample_state_change'.
-        # However, here the updates are batched together and send as a one
-        # update to the underlying widget.
+        # This is practically the same thing as in 'on_sample_state_change'. However,
+        # here the updates are batched together and sent as one update to the underlying widget.
         for sid, status, label in payload:
+            
+            if sid >= len(self._current_brushes):
+                # The indexing assumes that sid < len(self._current_brushes). However,
+                # when multiple ScatterWidgets exist, some receive state updates before
+                # their data is fully initialized, causing sid to be greater than the list
+                # size. This causes an IndexError, which does not affect the GUI at all
+                # (but we still want to remove the error to avoid confusions).
+                continue
+            
             self._logger.debug(f"Updating {sid} -> {status}, {label}")
 
             # If the sample is not the last sample, update its color normally
@@ -721,7 +729,13 @@ class ScatterWidget(QWidget):
                     ]
                 self._logger.debug((f"{sid} is the last sample -> No update "
                                     "to pen"))
-
+        
+        if SampleState.UNLABELED not in self._scatters:
+            # In the case of multiple ScatterWidgets, it is possible that the widget
+            # receives state updates before it has been fully initialized, so in these
+            # cases we want to avoid a KeyError.
+            return
+        
         self._scatters[SampleState.UNLABELED].setBrush(self._current_brushes)
         self._scatters[SampleState.UNLABELED].setPen(self._current_pens)
 

@@ -57,7 +57,10 @@ class Controller(QObject):
             self, session_path: Union[str, os.PathLike],
             n_samples: int,
             table_name: str = "annotations",
-            parent: Optional[QObject] = None
+            parent: Optional[QObject] = None,
+            labels: Optional[list] = None,
+            base_labels_numpy_file: Optional[str] = None,
+            session_loaded: bool = False
             ):
         '''
         Constructs the controller.
@@ -97,6 +100,13 @@ class Controller(QObject):
         self._logger = logger.get_logger("controller")
         self._logger.info(f"Storing data to {db_path}")
         self._logger.debug(f"Open connections: {self._conn.connectionNames()}")
+        
+        self._labels_from_config = labels or []
+        self._base_labels_file = base_labels_numpy_file
+        self._session_loaded = session_loaded
+        
+        if (self._base_labels_file is not None) and (not self._session_loaded):
+            self.load_base_labels(self._base_labels_file)
 
     @property
     def db_path(self) -> pathlib.Path:
@@ -218,6 +228,52 @@ class Controller(QObject):
             If the database file cannot be found
         '''
         self._db_path.unlink(missing_ok=False)
+    
+    def load_base_labels(self, fpath: str):
+        import numpy as np
+
+        arr = np.load(fpath, allow_pickle=True)
+        if len(arr) != self._n_samples:
+            raise ValueError(
+                f"Base label file contains {len(arr)} labels but dataset has {self._n_samples}"
+            )
+
+        # Validate unique labels
+        valid = set(self._labels_from_config) | {str(SampleState.UNLABELED)}
+        unknown = set(arr) - valid
+        if unknown:
+            raise ValueError(f"Invalid labels found in base label file: {unknown}")
+
+        # Apply all labels to DB
+        for sid, label in enumerate(arr):
+            try:
+                # Try inserting a new row
+                database.add_rows(
+                    self._conn,
+                    (
+                        sid,
+                        SampleState.ANNOTATED if label != str(SampleState.UNLABELED) else SampleState.UNLABELED,
+                        label,
+                        None,
+                    ),
+                    self._table_name,
+                )
+            except SQLException:
+                # If row exists -> update it
+                database.update_row(
+                    self._conn,
+                    {"sid": sid},
+                    {
+                        "status": SampleState.ANNOTATED
+                        if label != str(SampleState.UNLABELED)
+                        else SampleState.UNLABELED,
+                        "label": label,
+                    },
+                    self._table_name,
+                )
+
+            # Notify UI so scatter plots and widgets update
+            self.sign_sample_state_changed.emit(sid, label)
 
     @Slot()
     def on_request_sample(self, order_num: int, table_name: Optional[str] = None):

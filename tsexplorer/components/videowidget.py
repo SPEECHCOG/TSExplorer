@@ -53,9 +53,12 @@ class VideoWidget(QWidget):
             str, error=("Missing 'name'! This is likely an internal bug, "
                         "and not an user error")
         ),
-        "source_path": str,
+        Optional("source_path"): Use(str),
+        Optional("source_dirs"): [Use(str)],
         Optional("auto_play", default=False): bool,
         Optional("looped_play", default=False): bool,
+    
+        # The following are ignored when source_dirs is provided
         Optional("clip_length_s", default=0.0): And(Use(float), lambda x: x > 0),
         Optional("overhead_before_clip_ms", default=0.0): And(Use(float), lambda x: x >= 0),
         Optional("overhead_after_clip_ms", default=0.0): And(Use(float), lambda x: x >= 0),
@@ -81,33 +84,79 @@ class VideoWidget(QWidget):
         '''
         super().__init__(parent)
 
-        # Validate the user specified arguments
         kwargs = self._KWARGS_SCHEMA.validate(kwargs)
-
+        
         self._logger = get_logger("video-widget")
+        
+        self._use_dir_mode = kwargs.get("source_dirs", None) is not None
+
+        if self._use_dir_mode:
+            dirs = kwargs["source_dirs"]
+            
+            if isinstance(dirs, list):
+                if len(dirs) != 1:
+                    raise ValueError("VideoWidget only supports one directory in source_dirs.")
+                src_dir = pathlib.Path(dirs[0])
+            else:
+                raise ValueError("source_dirs must be a list of strings.")
+
+            if not src_dir.is_dir():
+                raise ValueError(f"source_dirs entry is not a directory: {src_dir}")
+
+            # Collect all video files (simple approach)
+            self._video_files = sorted(
+                p for p in src_dir.iterdir()
+                if p.suffix.lower() in {".mp4", ".avi", ".mov", ".mkv"}
+            )
+            if len(self._video_files) == 0:
+                raise ValueError("source_dirs contains no usable video files.")
+
+            self._logger.debug(f"Loaded {len(self._video_files)} videos from {src_dir}")
+
+        else:
+            if "source_path" not in kwargs:
+                raise ValueError("Either source_dirs or source_path must be provided.")
+
+            self._fp = pathlib.Path(kwargs.get("source_path"))
 
         # These will be set on '_create_layout'
         self._frame = None
         self._controls = None
         self._palette = None
+        
         # Create the UI
         self._create_layout()
-
-        self._logger.debug(f"Using auto-play?: {kwargs.get('auto_play')}")
-
-        self._fp = pathlib.Path(kwargs.get("source_path"))
+        
         self._player = MediaPlayer(self)
         self._player.connect_to_frame(self._frame)
-        self._player.set_data(self._fp)
 
-        # Save and modify the specified arguments
-        overlap_s: float = kwargs.pop("overlap_s")
-        kwargs["overlap_ms"] = 1e3*overlap_s
+        if not self._use_dir_mode:
+            self._player.set_data(self._fp)        
 
-        clip_length_s: float = kwargs.pop("clip_length_s")
-        kwargs["clip_length_ms"] = 1e3*clip_length_s
+        self._logger.debug(f"Using auto-play?: {kwargs.get('auto_play')}")
+        
+        if not self._use_dir_mode:
+            overlap_s = kwargs.pop("overlap_s")
+            kwargs["overlap_ms"] = 1e3 * overlap_s
+
+            clip_length_s = kwargs.pop("clip_length_s")
+            kwargs["clip_length_ms"] = 1e3 * clip_length_s
+
+            # If the user provided a Numpy file containing ID mappings, load it and use it in _get_start_and_stop_times
+            self._id_mapping_list = None
+            id_mapping_numpy_file = kwargs.get("id_mapping_numpy_file", None)
+            if id_mapping_numpy_file:
+                try:
+                    self._logger.debug(f"Loading ID mapping NumPy file from: {id_mapping_numpy_file}")
+                    self._id_mapping_list = load_numpy(pathlib.Path(id_mapping_numpy_file))
+                except Exception as e:
+                    self._logger.error(f"Failed to load ID mapping NumPy file: {e}")
+                    self.sign_error.emit(f"Failed to load ID mapping NumPy file: {e}")
+        else:
+            self._id_mapping_list = None
 
         self._props: Dict[str, Any] = kwargs
+        
         # Set to True if the overlap could be applied
         self._left_overlap: bool = False
         self._right_overlap: bool = False
@@ -115,6 +164,11 @@ class VideoWidget(QWidget):
         self._ready: bool = False
         self._wtype: WidgetType = WidgetType.VIDEO
         self._requires_update: bool = True
+        
+        # We define dummy values for directory mode so that the player state resets do not fail
+        if self._use_dir_mode:
+            self._start_time_ms = 0
+            self._stop_time_ms = 0
 
         self._player.sign_state_changed.connect(self._on_player_state_change)
 
@@ -129,17 +183,6 @@ class VideoWidget(QWidget):
         # Connect controls to the video widget
         self._controls.sign_slider_moved.connect(self._on_slider_move)
         self._controls.sign_slider_released.connect(self._on_slider_released)
-        
-        # If the user provided a Numpy file containing ID mappings, load it and use it in _get_start_and_stop_times
-        self._id_mapping_list = None
-        id_mapping_numpy_file = kwargs.get("id_mapping_numpy_file", None)
-        if id_mapping_numpy_file:
-            try:
-                self._logger.debug(f"Loading ID mapping NumPy file from: {id_mapping_numpy_file}")
-                self._id_mapping_list = load_numpy(pathlib.Path(id_mapping_numpy_file))
-            except Exception as e:
-                self._logger.error(f"Failed to load ID mapping NumPy file: {e}")
-                self.sign_error.emit(f"Failed to load ID mapping NumPy file: {e}")
 
     @property
     def wtype(self) -> WidgetType:
@@ -163,27 +206,47 @@ class VideoWidget(QWidget):
         data: Mapping[str, Any]
             The data to play out. Should contain only one value.
         '''
-        # In reality, should take in the order number of the clip to be played
-        # -> Only one video per session.
+        
         order_num = next(iter(data.values()))
+
+        if self._use_dir_mode:
+            # No video slicing --> straightforward file index
+            if not (0 <= order_num < len(self._video_files)):
+                raise IndexError("Video index out of range.")
+
+            fp = self._video_files[order_num]
+            self._player.set_data(fp)
+
+            # Dummy duration update because the slider needs something
+            dur_ms = self._player.get_duration()
+            self._controls.on_duration_changed(dur_ms)
+            self._controls.on_position_change(0)
+
+            if not self._ready:
+                self._ready = True
+                self.sign_ready.emit()
+            elif self._props["auto_play"]:
+                self._player.play()
+            return
+
+        # Single-video logic
         start_ms, stop_ms = self._get_start_and_stop_times(order_num)
         self._start_time_ms = start_ms
         self._stop_time_ms = stop_ms
 
-        dur_ms = self._stop_time_ms - self._start_time_ms
-        self._logger.debug(f"New duration {dur_ms}")
-        self._player.set_time(self._start_time_ms)
+        dur_ms = stop_ms - start_ms
+        self._player.set_time(start_ms)
         self._controls.on_duration_changed(dur_ms)
         self._controls.on_position_change(0)
 
         if not self._ready:
-            self._ready = True  # Ensure that this is emitted only once.
+            self._ready = True
             self.sign_ready.emit()
-
-        # if every widget is ready (including this one), and auto-play is
-        # set, start to play the clip
+        
+        # If every widget is ready and auto play is on, start to play the clip.
         elif self._props["auto_play"]:
             self._player.play()
+
 
     def shutdown(self):
         ''' Does the needed cleanup before shutting down. Currently no-op'''
@@ -281,10 +344,21 @@ class VideoWidget(QWidget):
         pos_ms: int
             The updated position in milliseconds.
         '''
-        # Update the state of other widgets
-        # NOTE: Now the pos_ms is the absolute position of the player, while
-        # we want the position in relation to the current clip!
+        
+        if self._use_dir_mode:
+            # No video slicing --> we don't use the "overlapping" logic
+            self.sign_cursor_moved.emit(pos_ms * 1e-3, 0.0, "video")
+            self._controls.on_position_change(pos_ms)
 
+            if self._props["looped_play"]:
+                # We want to seek slightly before the end of the file so that VLC never reaches its STOPPED
+                # state to make things run smoother (closing and then reopening the file causes lag)
+                if self._player.get_duration() - pos_ms < 300: # 300-ms tolerance since MP4s can stop 20-280 ms too early (key frames)
+                    self._player.set_time(0)
+                    #self._player.play()
+            return
+        
+        # NOTE: Now the pos_ms is the absolute position of the player, while we want the position in relation to the current clip!
         rel_pos_ms = pos_ms - self._start_time_ms
         if self._left_overlap:
             rel_pos_ms -= int(self._props["overlap_ms"])
@@ -326,6 +400,15 @@ class VideoWidget(QWidget):
             The updated state.
         '''
         state = MediaPlayerState(state)
+                
+        if self._use_dir_mode:
+            if state == MediaPlayerState.STOPPED:
+                if self._props.get("looped_play", False):
+                    self._player.set_time(0)
+                    self._player.play()
+                else:
+                    self.sign_cursor_moved.emit(0.0, 0.0, "video")
+                return
 
         if state == MediaPlayerState.STOPPED:
             self.sign_cursor_moved.emit(0.0, 0.0, "video")
@@ -358,6 +441,13 @@ class VideoWidget(QWidget):
             relative to the start of the slider (0 ms).
         '''
         self._logger.debug(f"Cursor position {rel_pos_ms}")
+        
+        if self._use_dir_mode:
+            # Directory mode --> direct movement
+            self.sign_cursor_moved.emit(rel_pos_ms * 1e-3, 0.0, "video")
+            self._player.on_cursor_move(rel_pos_ms)
+            return
+        
         extern_pos_ms = rel_pos_ms
         if self._left_overlap:
             extern_pos_ms -= int(self._props["overlap_ms"])
@@ -381,6 +471,12 @@ class VideoWidget(QWidget):
             position is relative to the start of the slider (0 ms).
         '''
 
+        if self._use_dir_mode:
+            # Directory mode --> direct movement
+            self.sign_cursor_move_ended.emit(rel_pos_ms * 1e-3, 0, "video")
+            self._player.on_cursor_move_ended(rel_pos_ms)
+            return
+        
         # Calculate the position for the external cursors (which don't know
         # about the overlap)
         extern_pos_ms = rel_pos_ms
@@ -405,6 +501,10 @@ class VideoWidget(QWidget):
         order_num: int
             The order number of the clip to be played
         '''
+        
+        if self._use_dir_mode:
+            raise RuntimeError("_get_start_and_stop_times should not be used in directory mode.")
+        
         clip_length_ms = self._props["clip_length_ms"]
         overlap_ms = self._props["overlap_ms"]
         overhead_before_ms = float(self._props.get("overhead_before_clip_ms", 0.0))
