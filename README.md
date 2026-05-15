@@ -28,7 +28,7 @@ Step-by-step installation instructions (__Anaconda recommended__):
 
 For cross-platform compatibility, TSExplorer uses _VLC Media Player_ to play audio and video. With VLC, common media player functions like play, pause, stop, and scrolling function normally. **If you need to use audio or video playback** with TSExplorer, you need to [install VLC](https://www.videolan.org/vlc/) before proceeding to use TSExplorer. Note that all the usage examples below require audio or video playback, i.e. installing VLC is required.
 
-**NOTE: In the current version of TSExplorer, installing VLC is required even if the user does not need media playback. This is a bug and will be fixed in an update in the near future.**
+**NOTE: In the current version of TSExplorer, <ins>installing VLC is required even if the user does not need media playback<ins>. This is a bug and will be fixed in an update in the near future.**
 
 
 ## Examples of how to use TSExplorer
