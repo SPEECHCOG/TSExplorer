@@ -2,10 +2,14 @@
 
 This repository contains a graphical user interface (GUI)-based interactive data annotation and exploration tool for time-series data called **Time-Series Explorer (TSExplorer)**. TSExplorer visualizes the entire dataset as a 2D scatter plot and allows annotators to freely explore complementary 2D representations of the underlying high-dimensional data. The code is partially implemented using the official PySide bindings for Qt6.
 
-**TSExplorer has been used in the following publication:**
-[E. Vaaras, M. Airaksinen, and O. Räsänen, "Evaluating interactive 2D visualization as a sample selection strategy for biomedical time-series data annotation", _Computers in Biology and Medicine_, vol. 213, Art. no. 111809, 2026](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
+**TSExplorer has been used in the following publications:**
+  * [E. Vaaras, M. Airaksinen, and O. Räsänen, "Evaluating interactive 2D visualization as a sample selection strategy for biomedical time-series data annotation", _Computers in Biology and Medicine_, vol. 213, Art. no. 111809, 2026](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
+  * [E. Vaaras, M. Airaksinen, and O. Räsänen, "TSExplorer: An interactive data annotation and exploration tool for time-series data", _(arXiv pre-print, accepted for publication in Proc. Interspeech 2026 in the Show & Tell track)_](https://arxiv.org/abs/2608.30514).
 
-If you use the present code or its derivatives, please cite the [repository URL](https://github.com/SPEECHCOG/TSExplorer) and/or the [aforementioned publication](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
+If you use the present code or its derivatives, please cite one or more of the following:
+  1. The [repository URL](https://github.com/SPEECHCOG/TSExplorer).
+  2. The [Computers in Biology and Medicine journal article](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
+  3. The [Interspeech 2026 paper](https://arxiv.org/abs/2608.30514).
 
 <ins>**Please note**</ins> that, while some features will still be added to TSExplorer, the code is not under constant maintenance. If you encounter any issues with the code or would like to request additional features, please contact [Einari Vaaras](https://www.tuni.fi/en/people/einari-vaaras).
 
@@ -18,11 +22,11 @@ If you use the present code or its derivatives, please cite the [repository URL]
 ## Installation
 The application should work on Windows, Linux, and MacOS, with Python versions 3.8.X - 3.10.X supported (version 3.9 recommended, as that version has been used for the majority of TSExplorer's development process).
 
-Step-by-step installation instructions (__Anaconda recommended__):
+Step-by-step installation instructions (__Miniforge/Miniconda/Anaconda recommended__):
   1. Either clone the repository (https://github.com/SPEECHCOG/TSExplorer.git) or download and extract the ZIP package of the repository (https://github.com/SPEECHCOG/TSExplorer --> _Code_ --> _Download ZIP_)
-  2. Open a terminal (PowerShell, Anaconda Prompt, Command Prompt etc. in Windows) and change the current directory to the TSExplorer directory using the command `cd path_of_tsexplorer`, where _path_of_tsexplorer_ is the directory where TSExplorer is located.
-  3. (_Optional for Anaconda users_) In a terminal where Conda is available, create a Conda environment where you will install TSExplorer by running the command `conda create -n tsexplorer_env python=3.9`, where _tsexplorer_env_ is the name of the Conda environment.
-  4. (_Optional for Anaconda users_) In a terminal where Conda is available, activate the Conda environment by running the command `conda activate tsexplorer_env`, where _tsexplorer_env_ is the name of the Conda environment.
+  2. Open a terminal (PowerShell, Miniforge Prompt, Anaconda Prompt, Command Prompt etc. in Windows) and change the current directory to the TSExplorer directory using the command `cd path_of_tsexplorer`, where _path_of_tsexplorer_ is the directory where TSExplorer is located.
+  3. (_Optional for Miniforge/Miniconda/Anaconda users_) In a terminal where Conda is available, create a Conda environment where you will install TSExplorer by running the command `conda create -n tsexplorer_env python=3.9`, where _tsexplorer_env_ is the name of the Conda environment.
+  4. (_Optional for Miniforge/Miniconda/Anaconda users_) In a terminal where Conda is available, activate the Conda environment by running the command `conda activate tsexplorer_env`, where _tsexplorer_env_ is the name of the Conda environment.
   5. Install TSExplorer using the command `pip install .` (note the period "." **which belongs** to the command).
   6. Verify that the installation succeeded using the command `tsexplorer --version`. After a successful installation, this command should print the current version of TSExplorer to the command line.
 
@@ -225,15 +229,15 @@ When letting TSExplorer select samples for you (i.e. either pressing the "next s
 
 ## Uninstalling TSExplorer
 
-### Anaconda users
+### Miniforge/Miniconda/Anaconda users
 
-Anaconda users can uninstall TSExplorer using the following commands:
+Miniforge/Miniconda/Anaconda users can uninstall TSExplorer using the following commands:
   1. `conda deactivate` (if Conda environment is not deactivated yet)
   2. `conda remove --name tsexplorer_env --all` (given that the name of the Conda environment was _tsexplorer_env_)
 
-### Non-Anaconda users
+### Non-Miniforge/Miniconda/Anaconda users
 
-If you installed TSExplorer without Anaconda, you can uninstall it using the following command:
+If you installed TSExplorer without Miniforge/Miniconda/Anaconda, you can uninstall it using the following command:
 ```
 pip uninstall tsexplorer
 ```
