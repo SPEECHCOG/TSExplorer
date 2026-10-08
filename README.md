@@ -4,12 +4,12 @@ This repository contains a graphical user interface (GUI)-based interactive data
 
 **TSExplorer has been used in the following publications:**
   * [E. Vaaras, M. Airaksinen, and O. Räsänen, "Evaluating interactive 2D visualization as a sample selection strategy for biomedical time-series data annotation", _Computers in Biology and Medicine_, vol. 213, Art. no. 111809, 2026](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
-  * [E. Vaaras, M. Airaksinen, and O. Räsänen, "TSExplorer: An interactive data annotation and exploration tool for time-series data", _(arXiv pre-print, accepted for publication in Proc. Interspeech 2026 in the Show & Tell track)_](https://arxiv.org/abs/2608.30514).
+  * [E. Vaaras, M. Airaksinen, and O. Räsänen, "TSExplorer: An interactive data annotation and exploration tool for time-series data", in _Proc. INTERSPEECH 2026_, pp. 5910–5911](https://www.isca-archive.org/interspeech_2026/vaaras26_interspeech.html).
 
 If you use the present code or its derivatives, please cite one or more of the following:
   1. The [repository URL](https://github.com/SPEECHCOG/TSExplorer).
   2. The [Computers in Biology and Medicine journal article](https://www.sciencedirect.com/science/article/pii/S0010482526003732).
-  3. The [Interspeech 2026 paper](https://arxiv.org/abs/2608.30514).
+  3. The [Interspeech 2026 paper](https://www.isca-archive.org/interspeech_2026/vaaras26_interspeech.html).
 
 <ins>**Please note**</ins> that, while some features will still be added to TSExplorer, the code is not under constant maintenance. If you encounter any issues with the code or would like to request additional features, please contact [Einari Vaaras](https://www.tuni.fi/en/people/einari-vaaras).
 
